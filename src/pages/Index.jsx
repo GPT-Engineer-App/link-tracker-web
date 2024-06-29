@@ -15,6 +15,7 @@ const Index = () => {
   const [tags, setTags] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState("");
+  const [bulkUploadData, setBulkUploadData] = useState("");
 
   const handleAddLink = () => {
     if (!linkName || !linkURL) {
@@ -38,6 +39,37 @@ const Index = () => {
     setLinkName("");
     setLinkURL("");
     setTags("");
+    setError("");
+  };
+
+  const handleBulkUpload = () => {
+    const lines = bulkUploadData.split("\n");
+    const newLinks = [];
+
+    for (const line of lines) {
+      const [name, url, tags] = line.split(",");
+      if (!name || !url) {
+        setError("Each line must contain a name and a URL.");
+        return;
+      }
+
+      if (links.some((link) => link.name === name) || newLinks.some((link) => link.name === name)) {
+        setError(`Link name "${name}" must be unique.`);
+        return;
+      }
+
+      try {
+        new URL(url);
+      } catch (_) {
+        setError(`Invalid URL "${url}".`);
+        return;
+      }
+
+      newLinks.push({ name, url, tags: tags ? tags.split(";").map(tag => tag.trim()) : [], traffic: 0 });
+    }
+
+    setLinks([...links, ...newLinks]);
+    setBulkUploadData("");
     setError("");
   };
 
@@ -100,6 +132,15 @@ const Index = () => {
         <CSVLink data={csvData} filename={"links.csv"}>
           <Button>Export to CSV</Button>
         </CSVLink>
+      </div>
+      <div className="mb-4">
+        <Textarea
+          placeholder="Bulk upload data (name,url,tags;tag2;tag3 per line)"
+          value={bulkUploadData}
+          onChange={(e) => setBulkUploadData(e.target.value)}
+          className="mr-2"
+        />
+        <Button onClick={handleBulkUpload}>Bulk Upload</Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredLinks.map((link, index) => (
