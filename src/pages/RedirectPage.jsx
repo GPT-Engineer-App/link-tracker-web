@@ -12,7 +12,7 @@ const RedirectPage = ({ links, handleLinkClick }) => {
   }, [linkName]);
 
   if (!link) {
-    return <div>Link not found</div>;
+    return <div className="text-center text-red-500">Link not found</div>;
   }
 
   return (

@@ -15,7 +15,7 @@ const IntermediateRedirect = ({ links }) => {
   }, [linkName, navigate, link]);
 
   if (!link) {
-    return <div>Link not found</div>;
+    return <div className="text-center text-red-500">Link not found</div>;
   }
 
   return (
